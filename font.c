@@ -394,16 +394,6 @@ void font_sync_language_fallback(void) {
     language_force_font_id = 0;
     if (!font_loaded || active_language_supported(&font_info)) return;
 
-    /* Keep Latin-script locales on the selected UI face. Individual missing
-     * accented glyphs already fall back per glyph; forcing the whole locale
-     * onto DejaVu changed Spanish/Polish typography. */
-    const char *lang = i18n_current_language();
-    int needs_nonlatin = lang &&
-        (!strncmp(lang, "ru", 2) || !strncmp(lang, "uk", 2) ||
-         !strncmp(lang, "zh", 2) || !strncmp(lang, "ja", 2) ||
-         !strncmp(lang, "ko", 2));
-    if (!needs_nonlatin) return;
-
     /* Prefer one fallback that covers the whole active pack. WenQuanYi is our
      * broad CJK/Cyrillic face, while DejaVu covers Latin Extended (including
      * Polish), which WenQuanYi deliberately does not ship. */

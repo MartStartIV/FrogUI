@@ -424,6 +424,7 @@ static uint16_t *view_transition_old = NULL;
 static uint16_t *view_transition_out = NULL;
 static int view_transition_frame = VIEW_TRANSITION_FRAMES + 1;
 static int is_app_folder_name(const char *name);
+static bool is_psp_folder(const char *folder);
 static char ui_toast_text[96] = "";
 static int ui_toast_frames = 0;
 /* The UI's idle path polls input at about 1 kHz.  These must not be frame
@@ -859,6 +860,7 @@ static int settings_audio_mute_reassert = 0;
 static int settings_filter_idx = 1;     /* forced bilinear (option removed from menu) */
 static int settings_filter_idx_on_enter = 0;  /* snapshot for restart-on-change */
 static int settings_quick_resume = 0;      /* boot straight into last game: 0=off, 1=on. Settings key stays "auto_resume" for upgrade compat. */
+static int settings_custom_aspect_ratios = 0; /* expose forced aspect-ratio choices in PicoArch */
 static int settings_autosave_autoload = 1; /* auto-save on pause/quit + auto-load on any game launch (boot or manual pick): 0=off, 1=on */
 static int settings_anim = 1;           /* UI animations: 0=off, 1=on */
 static int settings_menu_sounds = 0;    /* short navigation tick: 0=off, 1=on */
@@ -935,7 +937,7 @@ static const SRow settings_rows[] = {
     { RT_HEADER, "settings.appearance" }, { RT_THEME, "settings.theme" }, { RT_THEME_PACK, "settings.background_theme_pack" }, { RT_STYLE, "settings.style" }, { RT_ICON_PACK, "settings.icon_pack" }, { RT_TOGGLE, "settings.center_text", &settings_center_text }, { RT_TOGGLE, "settings.friendly_system_names", &settings_friendly_names }, { RT_FONT, "settings.font" }, { RT_TOGGLE, "settings.battery_colour_mode", &settings_battery_color }, { RT_TOGGLE, "settings.background_images", &settings_backgrounds }, { RT_RANGE, "settings.background_dim", &settings_background_dim, 0, 100, 5 }, { RT_WALLPAPER, "settings.wallpaper" }, { RT_WALLFIT, "settings.background_image_fit" },
     { RT_HEADER, "settings.general" }, { RT_LANGUAGE, "settings.language", &settings_language }, { RT_RANGE, "settings.brightness", &settings_brightness, 0, 100, SETTINGS_BRIGHTNESS_STEP }, { RT_TOGGLE, "settings.animations", &settings_anim }, { RT_TOGGLE, "settings.menu_sounds", &settings_menu_sounds }, { RT_TOGGLE, "settings.hide_extensions", &settings_hide_extensions }, { RT_TOGGLE, "settings.hide_empty_folders", &settings_hide_empty },
     { RT_HEADER, "settings.library" }, { RT_ROM_SOURCE, "settings.rom_source" }, { RT_OTG_STATUS, "settings.otg_storage" }, { RT_TOGGLE, "settings.game_switcher", &settings_game_switcher }, { RT_TOGGLE, "settings.start_in_recents", &settings_load_recents },
-    { RT_HEADER, "settings.gameplay" }, { RT_TOGGLE, "settings.quick_resume", &settings_quick_resume }, { RT_TOGGLE, "settings.autosave_autoload", &settings_autosave_autoload },
+    { RT_HEADER, "settings.gameplay" }, { RT_TOGGLE, "settings.quick_resume", &settings_quick_resume }, { RT_TOGGLE, "settings.autosave_autoload", &settings_autosave_autoload }, { RT_TOGGLE, "settings.custom_aspect_ratios", &settings_custom_aspect_ratios },
     { RT_HEADER, "settings.system" }, { RT_RANGE, "settings.volume", &settings_volume, 0, 100, 5 }, { RT_TOGGLE, "settings.file_cache", &settings_file_cache }, { RT_CACHE_REBUILD, "settings.rebuild_file_cache" }, { RT_TOGGLE, "settings.disable_sleep", &settings_disable_sleep }, { RT_ACTION, "settings.button_mapping" }, { RT_INFO, "settings.version" },
 };
 #define SETTINGS_ROW_N ((int)(sizeof(settings_rows) / sizeof(settings_rows[0])))
@@ -1255,6 +1257,8 @@ static void settings_load_file(void) {
             settings_quick_resume = (strcmp(val, "on") == 0) ? 1 : 0;
         } else if (strcmp(line, "autosave_autoload") == 0) {
             settings_autosave_autoload = (strcmp(val, "on") == 0) ? 1 : 0;
+        } else if (strcmp(line, "custom_aspect_ratios") == 0) {
+            settings_custom_aspect_ratios = (strcmp(val, "on") == 0) ? 1 : 0;
         } else if (strcmp(line, "hide_empty") == 0) {
             settings_hide_empty = (strcmp(val, "on") == 0) ? 1 : 0;
         } else if (strcmp(line, "hide_extensions") == 0) {
@@ -1344,6 +1348,7 @@ static void settings_save_file(void) {
     fprintf(f, "filter=%s\n", filter_names[settings_filter_idx]);
     fprintf(f, "auto_resume=%s\n", onoff_names[settings_quick_resume]);
     fprintf(f, "autosave_autoload=%s\n", onoff_names[settings_autosave_autoload]);
+    fprintf(f, "custom_aspect_ratios=%s\n", onoff_names[settings_custom_aspect_ratios]);
     fprintf(f, "animations=%s\n", onoff_names[settings_anim]);
     fprintf(f, "menu_sounds=%s\n", onoff_names[settings_menu_sounds]);
     fprintf(f, "style=%s\n", style_keys[settings_style]);
@@ -1786,6 +1791,7 @@ static void scan_directory(const char *path) {
             }
             /* Always hide the internal "menu" folder at the root. */
             if (isdir && at_root && strcasecmp(e->d_name, "menu") == 0) continue;
+            if (isdir && at_root && is_psp_folder(e->d_name)) continue;
             /* Media libraries live under Apps, not in the Games tab. */
             if (isdir && at_root && is_app_folder_name(e->d_name)) continue;
             /* Inside a filtered system, per-game folders with no whitelisted
@@ -1829,6 +1835,7 @@ static void scan_directory(const char *path) {
         for (int read = 0; read < entry_count; read++) {
             if (entries[read].is_dir &&
                 (strcasecmp(entries[read].name, "menu") == 0 ||
+                 is_psp_folder(entries[read].name) ||
                  is_app_folder_name(entries[read].name))) continue;
             if (write != read) entries[write] = entries[read];
             write++;
@@ -2679,7 +2686,7 @@ static void search_walk(const char *dir, int depth) {
         struct stat st;
         if (stat(p, &st) != 0) continue;
         if (S_ISDIR(st.st_mode)) {
-            if (depth < 3) search_walk(p, depth + 1);
+            if (!is_psp_folder(e->d_name) && depth < 3) search_walk(p, depth + 1);
         } else if (str_icontains(e->d_name, search_query)) {
             /* Same per-system whitelist as the browser, so search results never
              * resurrect the hidden companion files (PS1 .bin tracks). The
