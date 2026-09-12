@@ -36,6 +36,7 @@
   "settings.background_image_fit": "背景イメージのフィット",
   "settings.hide_extensions": "拡張子を隠す",
   "settings.hide_empty_folders": "空フォルダを隠す",
+  "settings.custom_aspect_ratios": "すべての縦横比",
   "settings.library": "ライブラリ",
   "settings.rom_source": "ROMソース",
   "settings.otg_storage": "OTGストレージ",
@@ -64,6 +65,13 @@
   ,"header.add_extension": "拡張子 追加"
   ,"header.usb_mode": "USBモード"
   ,"remap.skip": "[B] = スキップ / デフォルト維持"
+  ,"remap.press": "%s を押す  (%d / %d)"
+  ,"remap.saved": "ボタンマッピングを保存しました"
+  ,"remap.save_failed": "ボタンマッピングを保存できませんでした"
+  ,"button.up": "上"
+  ,"button.down": "下"
+  ,"button.left": "左"
+  ,"button.right": "右"
   ,"picker.cores": "コア"
   ,"picker.extensions": "拡張子"
   ,"picker.filter_files": "ファイルのフィルタ"
