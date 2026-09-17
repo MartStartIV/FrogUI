@@ -8,6 +8,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_OUTLINE_H
 
 #include <hb-ft.h>
 #include <hb.h>
@@ -23,14 +24,13 @@ static float ui_font_size = DEFAULT_FONT_SIZE * UI_SCALE / 100.0f;
 #define GLYPH_CACHE_SIZE 4096
 #define MAX_STACK_CODEPOINTS 512
 
-// Memory Pool Constants
-#define FONT_BUFFER_MAX_SIZE (24 * 1024 * 1024) // 24MB max font file size
-#define GLYPH_PIXEL_POOL_SIZE                                                  \
-  (2 * 1024 * 1024) // 2MB bump arena for glyph bitmaps
+#define FONT_BUFFER_MAX_SIZE (24 * 1024 * 1024)
+#define GLYPH_PIXEL_POOL_SIZE (2 * 1024 * 1024)
 
 typedef struct {
   uint32_t glyph_index;
   int font_id;
+  int is_bold;
   int width;
   int rows;
   int left;
@@ -46,12 +46,10 @@ typedef struct {
   int loaded;
 } FontFace;
 
-// Static font buffers allocated in BSS to prevent runtime allocation
 static uint8_t primary_font_bytes[FONT_BUFFER_MAX_SIZE];
 static uint8_t fallback_font_bytes[FONT_BUFFER_MAX_SIZE];
 static uint8_t latin_font_bytes[FONT_BUFFER_MAX_SIZE];
 
-/* Static Glyph Bitmap Arena Allocator */
 static uint8_t glyph_bitmap_arena[GLYPH_PIXEL_POOL_SIZE];
 static size_t arena_offset = 0;
 
@@ -65,40 +63,39 @@ static int language_force_font_id = 0;
 
 static CachedGlyph glyph_cache[GLYPH_CACHE_SIZE];
 
-// Clear Cache Entries & Reset Bump Arena
 static void clear_glyph_cache(void) {
   for (int i = 0; i < GLYPH_CACHE_SIZE; i++) {
     glyph_cache[i].bitmap = NULL;
     glyph_cache[i].glyph_index = 0;
     glyph_cache[i].font_id = -1;
+    glyph_cache[i].is_bold = 0;
   }
   arena_offset = 0;
 }
 
-// Bitwise RGB565 Alpha Blending with branch-optimized early exit
-static inline void font_blend_pixel_fast(uint16_t *dst, uint16_t color,
-                                         uint32_t alpha) {
+static inline void font_blend_pixel(uint16_t *dst, uint16_t color,
+                                    unsigned char alpha) {
   if (alpha == 255) {
     *dst = color;
     return;
   }
+  if (alpha == 0)
+    return;
 
-  uint32_t bg = *dst;
-  uint32_t inv_a = 255 - alpha;
+  uint16_t bg = *dst;
+  uint32_t fr = (color >> 11) & 0x1F;
+  uint32_t fg = (color >> 5) & 0x3F;
+  uint32_t fb = color & 0x1F;
 
-  uint32_t fg_r = (color >> 11) & 0x1F;
-  uint32_t fg_g = (color >> 5) & 0x3F;
-  uint32_t fg_b = color & 0x1F;
+  uint32_t br = (bg >> 11) & 0x1F;
+  uint32_t bgc = (bg >> 5) & 0x3F;
+  uint32_t bb = bg & 0x1F;
 
-  uint32_t bg_r = (bg >> 11) & 0x1F;
-  uint32_t bg_g = (bg >> 5) & 0x3F;
-  uint32_t bg_b = bg & 0x1F;
+  uint32_t rr = (fr * alpha + br * (255 - alpha) + 127) / 255;
+  uint32_t rg = (fg * alpha + bgc * (255 - alpha) + 127) / 255;
+  uint32_t rb = (fb * alpha + bb * (255 - alpha) + 127) / 255;
 
-  uint32_t r = ((fg_r * alpha) + (bg_r * inv_a)) >> 8;
-  uint32_t g = ((fg_g * alpha) + (bg_g * inv_a)) >> 8;
-  uint32_t b = ((fg_b * alpha) + (bg_b * inv_a)) >> 8;
-
-  *dst = (uint16_t)((r << 11) | (g << 5) | b);
+  *dst = (uint16_t)((rr << 11) | (rg << 5) | rb);
 }
 
 static uint32_t utf8_next(const char **p) {
@@ -133,39 +130,8 @@ static uint32_t utf8_next(const char **p) {
   return 0xfffd;
 }
 
-static uint32_t unicode_upper(uint32_t cp) {
-  if (cp >= 'a' && cp <= 'z')
-    return cp - 32;
-  if (cp >= 0xE0 && cp <= 0xF6)
-    return cp - 0x20;
-  if (cp >= 0xF8 && cp <= 0xFE)
-    return cp - 0x20;
-  switch (cp) {
-  case 0x0105:
-    return 0x0104;
-  case 0x0107:
-    return 0x0106;
-  case 0x0119:
-    return 0x0118;
-  case 0x0142:
-    return 0x0141;
-  case 0x0144:
-    return 0x0143;
-  case 0x015B:
-    return 0x015A;
-  case 0x017A:
-    return 0x0179;
-  case 0x017C:
-    return 0x017B;
-  default:
-    return cp;
-  }
-}
-
-// Arena allocation for rendered glyph bitmaps
 static uint8_t *arena_alloc(size_t size) {
   if (arena_offset + size > GLYPH_PIXEL_POOL_SIZE) {
-    /* Cache memory pressure hit: reset arena & clear cache */
     clear_glyph_cache();
   }
 
@@ -175,16 +141,33 @@ static uint8_t *arena_alloc(size_t size) {
 }
 
 static CachedGlyph *get_cached_glyph(FontFace *face, uint32_t glyph_index,
-                                     int font_id) {
-  uint32_t hash =
-      (glyph_index ^ ((uint32_t)font_id * 0x9e3779b9)) % GLYPH_CACHE_SIZE;
+                                     int font_id, int is_bold) {
+  int is_native_bold = (face->ft_face->style_flags & FT_STYLE_FLAG_BOLD) != 0;
+  int effective_bold = is_bold && !is_native_bold;
+
+  uint32_t hash = (glyph_index ^ ((uint32_t)font_id * 0x9e3779b9) ^
+                   ((uint32_t)effective_bold * 0x85ebca6b)) %
+                  GLYPH_CACHE_SIZE;
 
   if (glyph_cache[hash].glyph_index == glyph_index &&
-      glyph_cache[hash].font_id == font_id && glyph_cache[hash].bitmap) {
+      glyph_cache[hash].font_id == font_id &&
+      glyph_cache[hash].is_bold == effective_bold && glyph_cache[hash].bitmap) {
     return &glyph_cache[hash];
   }
 
-  if (FT_Load_Glyph(face->ft_face, glyph_index, FT_LOAD_RENDER)) {
+  FT_Int32 load_flags =
+      FT_LOAD_NO_BITMAP | FT_LOAD_TARGET_LIGHT | FT_LOAD_FORCE_AUTOHINT;
+  if (FT_Load_Glyph(face->ft_face, glyph_index, load_flags)) {
+    return NULL;
+  }
+
+  if (effective_bold &&
+      face->ft_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+    FT_Pos strength = (1 << 6);
+    FT_Outline_Embolden(&face->ft_face->glyph->outline, strength);
+  }
+
+  if (FT_Render_Glyph(face->ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
     return NULL;
   }
 
@@ -192,6 +175,7 @@ static CachedGlyph *get_cached_glyph(FontFace *face, uint32_t glyph_index,
 
   glyph_cache[hash].glyph_index = glyph_index;
   glyph_cache[hash].font_id = font_id;
+  glyph_cache[hash].is_bold = effective_bold;
   glyph_cache[hash].width = bitmap->width;
   glyph_cache[hash].rows = bitmap->rows;
   glyph_cache[hash].left = face->ft_face->glyph->bitmap_left;
@@ -216,8 +200,6 @@ static CachedGlyph *get_cached_glyph(FontFace *face, uint32_t glyph_index,
 static void update_face_pixel_sizes(FontFace *face) {
   if (face && face->loaded && face->ft_face) {
     FT_Set_Pixel_Sizes(face->ft_face, 0, (FT_UInt)ui_font_size);
-    // Ensure HarfBuzz scale matches FreeType's pixel size (26.6 fractional
-    // units)
     hb_ft_font_changed(face->hb_font);
   }
 }
@@ -236,10 +218,6 @@ void font_set_size(int pixels) {
   clear_glyph_cache();
 }
 
-/**
- * Utility function to retrieve the active base font size in points/pixels.
- * Accounts for UI_SCALE to reverse-calculate original pixel settings.
- */
 int font_get_size(void) {
   return (int)(ui_font_size * 100.0f / UI_SCALE + 0.5f);
 }
@@ -323,9 +301,15 @@ static int load_font_file(const char *font_filename) {
 static int load_fallback_font(void) {
   if (fallback_font.loaded)
     return 1;
-  const char *paths[] = {"/mnt/sdcard/frogui/fonts/TreeFrogUnicode.ttf",
-                         "/mnt/sdcard/cubegm/fonts/TreeFrogUnicode.ttf",
-                         "fonts/TreeFrogUnicode.ttf"};
+
+  const char *font_name = get_default_language_font_name("TreeFrogUnicode.ttf");
+
+  char path0[256], path1[256], path2[256];
+  snprintf(path0, sizeof(path0), "/mnt/sdcard/frogui/fonts/%s", font_name);
+  snprintf(path1, sizeof(path1), "/mnt/sdcard/cubegm/fonts/%s", font_name);
+  snprintf(path2, sizeof(path2), "fonts/%s", font_name);
+
+  const char *paths[] = {path0, path1, path2};
   return load_font_face(&fallback_font, paths, 3);
 }
 
@@ -341,7 +325,9 @@ static int load_latin_fallback(void) {
 void font_load_file(const char *font_filename) {
   if (!font_filename || !font_filename[0])
     return;
-  load_font_file(font_filename);
+  if (load_font_file(font_filename)) {
+    font_sync_language_fallback();
+  }
 }
 
 void font_load_from_settings(const char *font_name) {
@@ -353,7 +339,9 @@ void font_load_from_settings(const char *font_name) {
   } else {
     font_filename = "BPreplayBold.otf";
   }
-  load_font_file(font_filename);
+  if (load_font_file(font_filename)) {
+    font_sync_language_fallback();
+  }
 }
 
 void font_init(void) {
@@ -367,36 +355,34 @@ void font_init(void) {
 
   load_fallback_font();
   load_latin_fallback();
+  font_sync_language_fallback();
 }
 
 static inline FontFace *get_face_for_codepoint(uint32_t cp, int *out_font_id) {
-  if (language_force_font_id == 1 && load_fallback_font()) {
-    if (out_font_id)
-      *out_font_id = 1;
-    return &fallback_font;
-  }
-  if (language_force_font_id == 2 && load_latin_fallback()) {
-    if (out_font_id)
-      *out_font_id = 2;
-    return &latin_font;
+  if (language_force_font_id == 0 && primary_font.loaded) {
+    if (FT_Get_Char_Index(primary_font.ft_face, cp) != 0) {
+      if (out_font_id)
+        *out_font_id = 0;
+      return &primary_font;
+    }
   }
 
-  if (primary_font.loaded && FT_Get_Char_Index(primary_font.ft_face, cp)) {
-    if (out_font_id)
-      *out_font_id = 0;
-    return &primary_font;
+  if ((language_force_font_id == 1 || language_force_font_id == 0) &&
+      load_fallback_font()) {
+    if (FT_Get_Char_Index(fallback_font.ft_face, cp) != 0) {
+      if (out_font_id)
+        *out_font_id = 1;
+      return &fallback_font;
+    }
   }
 
-  if (load_fallback_font() && FT_Get_Char_Index(fallback_font.ft_face, cp)) {
-    if (out_font_id)
-      *out_font_id = 1;
-    return &fallback_font;
-  }
-
-  if (load_latin_fallback() && FT_Get_Char_Index(latin_font.ft_face, cp)) {
-    if (out_font_id)
-      *out_font_id = 2;
-    return &latin_font;
+  if ((language_force_font_id == 2 || language_force_font_id == 0) &&
+      load_latin_fallback()) {
+    if (FT_Get_Char_Index(latin_font.ft_face, cp) != 0) {
+      if (out_font_id)
+        *out_font_id = 2;
+      return &latin_font;
+    }
   }
 
   if (primary_font.loaded) {
@@ -410,12 +396,10 @@ static inline FontFace *get_face_for_codepoint(uint32_t cp, int *out_font_id) {
   return fallback_font.loaded ? &fallback_font : NULL;
 }
 
-// Stack & Arena Renderer Engine with per-codepoint CJK Fallback + Multi-line
-// handling
-static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
-                                       int screen_height, int x, int y,
-                                       const char *text, uint16_t color,
-                                       int measure_only, int *out_width) {
+static void shape_and_render_text(uint16_t *framebuffer, int screen_width,
+                                  int screen_height, int x, int y,
+                                  const char *text, uint16_t color, int is_bold,
+                                  int measure_only, int *out_width) {
   if (!text || !*text) {
     if (out_width)
       *out_width = 0;
@@ -432,7 +416,6 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
     SBUInt32 codepoint_count = 0;
     const char *p = line_start;
 
-    // Process characters until end of string or newline
     while (*p && *p != '\n' && codepoint_count < MAX_STACK_CODEPOINTS) {
       utf32_buf[codepoint_count++] = utf8_next(&p);
     }
@@ -455,8 +438,8 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
             SBUInt32 run_count = SBLineGetRunCount(line);
             const SBRun *runs = SBLineGetRunsPtr(line);
 
-            int line_width = 0;
-            int cursor_x = start_x;
+            int line_width_fractional = 0;
+            int cursor_x_fractional = start_x << 6;
 
             for (SBUInt32 r = 0; r < run_count; r++) {
               SBUInt32 run_offset = runs[r].offset;
@@ -489,7 +472,6 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
                 hb_buffer_add_utf32(
                     hb_buf, (const uint32_t *)&utf32_buf[run_offset + sub_idx],
                     chunk_len, 0, chunk_len);
-
                 hb_buffer_set_direction(hb_buf, (run_level & 1)
                                                     ? HB_DIRECTION_RTL
                                                     : HB_DIRECTION_LTR);
@@ -504,24 +486,26 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
                     hb_buffer_get_glyph_positions(hb_buf, &glyph_count);
 
                 int baseline = face->ft_face->size->metrics.ascender >> 6;
-                int is_bold_fallback =
-                    (language_force_font_id &&
-                     active_font_id == language_force_font_id);
+                int is_native_bold =
+                    (face->ft_face->style_flags & FT_STYLE_FLAG_BOLD) != 0;
 
                 for (unsigned int i = 0; i < glyph_count; i++) {
                   uint32_t glyph_index = glyph_info[i].codepoint;
 
-                  // HarfBuzz positions are in 26.6 fractional pixels
-                  int x_offset = glyph_pos[i].x_offset >> 6;
+                  int x_offset = glyph_pos[i].x_offset;
                   int y_offset = glyph_pos[i].y_offset >> 6;
-                  int x_advance = glyph_pos[i].x_advance >> 6;
+                  int x_advance = glyph_pos[i].x_advance;
+
+                  if (is_bold && !is_native_bold) {
+                    x_advance += (1 << 6);
+                  }
 
                   if (!measure_only && framebuffer) {
-                    CachedGlyph *cg =
-                        get_cached_glyph(face, glyph_index, active_font_id);
+                    CachedGlyph *cg = get_cached_glyph(face, glyph_index,
+                                                       active_font_id, is_bold);
                     if (cg && cg->bitmap) {
-                      // cg->left is in pixels from FreeType bitmap_left
-                      int draw_x = cursor_x + cg->left + x_offset;
+                      int draw_x =
+                          ((cursor_x_fractional + x_offset) >> 6) + cg->left;
                       int draw_y = current_y + baseline - cg->top - y_offset;
 
                       for (int row = 0; row < cg->rows; row++) {
@@ -537,12 +521,7 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
                           if (alpha > 0) {
                             int px = draw_x + col;
                             if (px >= 0 && px < screen_width) {
-                              font_blend_pixel_fast(&line_dst[px], color,
-                                                    alpha);
-                              if (is_bold_fallback && (px + 1) < screen_width) {
-                                font_blend_pixel_fast(&line_dst[px + 1], color,
-                                                      alpha);
-                              }
+                              font_blend_pixel(&line_dst[px], color, alpha);
                             }
                           }
                         }
@@ -550,17 +529,17 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
                     }
                   }
 
-                  // Advance cursor
-                  cursor_x += x_advance;
-                  line_width += x_advance;
+                  cursor_x_fractional += x_advance;
+                  line_width_fractional += x_advance;
                 }
 
                 sub_idx += chunk_len;
               }
             }
 
-            if (line_width > max_width) {
-              max_width = line_width;
+            int line_width_px = (line_width_fractional + 32) >> 6;
+            if (line_width_px > max_width) {
+              max_width = line_width_px;
             }
 
             SBLineRelease(line);
@@ -582,37 +561,41 @@ static void shape_and_render_bidi_text(uint16_t *framebuffer, int screen_width,
     *out_width = max_width;
 }
 
-void font_draw_char(uint16_t *framebuffer, int screen_width, int screen_height,
-                    int x, int y, char c, uint16_t color) {
-  char str[2] = {c, '\0'};
-  font_draw_text(framebuffer, screen_width, screen_height, x, y, str, color);
-}
-
 void font_draw_text(uint16_t *framebuffer, int screen_width, int screen_height,
-                    int x, int y, const char *text, uint16_t color) {
-  shape_and_render_bidi_text(framebuffer, screen_width, screen_height, x, y,
-                             text, color, 0, NULL);
+                    int x, int y, const char *text, uint16_t color,
+                    int is_bold) {
+  shape_and_render_text(framebuffer, screen_width, screen_height, x, y, text,
+                        color, is_bold, 0, NULL);
 }
 
-int font_measure_text(const char *text) {
+int font_measure_text(const char *text, int is_bold) {
   int width = 0;
-  shape_and_render_bidi_text(NULL, 0, 0, 0, 0, text, 0, 1, &width);
+  shape_and_render_text(NULL, 0, 0, 0, 0, text, 0, is_bold, 1, &width);
   return width;
 }
 
 void font_cap_metrics(int *baseline_out, int *cap_height_out) {
   int baseline = 0, cap = 0;
-  if (primary_font.loaded) {
-    FT_Size_Metrics *metrics = &primary_font.ft_face->size->metrics;
+
+  FontFace *active_face = &primary_font;
+  if (language_force_font_id == 1 && fallback_font.loaded) {
+    active_face = &fallback_font;
+  } else if (language_force_font_id == 2 && latin_font.loaded) {
+    active_face = &latin_font;
+  }
+
+  if (active_face->loaded && active_face->ft_face) {
+    FT_Size_Metrics *metrics = &active_face->ft_face->size->metrics;
     baseline = metrics->ascender >> 6;
 
-    FT_UInt gi = FT_Get_Char_Index(primary_font.ft_face, 'H');
-    if (gi && !FT_Load_Glyph(primary_font.ft_face, gi, FT_LOAD_DEFAULT)) {
-      cap = (int)(primary_font.ft_face->glyph->metrics.height >> 6);
+    FT_UInt gi = FT_Get_Char_Index(active_face->ft_face, 'H');
+    if (gi && !FT_Load_Glyph(active_face->ft_face, gi, FT_LOAD_DEFAULT)) {
+      cap = (int)(active_face->ft_face->glyph->metrics.height >> 6);
     } else {
       cap = baseline;
     }
   }
+
   if (baseline_out)
     *baseline_out = baseline;
   if (cap_height_out)
@@ -622,31 +605,63 @@ void font_cap_metrics(int *baseline_out, int *cap_height_out) {
 static int active_language_supported(FontFace *face) {
   if (!face || !face->loaded)
     return 0;
+
   char selected_key[32];
   snprintf(selected_key, sizeof(selected_key), "language.%s",
            i18n_current_language());
+
+  int total_checks = 0;
+  int supported_glyphs = 0;
+
   for (int i = 0; i < i18n_value_count(); i++) {
     const char *key = i18n_key_at(i);
     const char *text = i18n_value_at(i);
+
     if (key && strncmp(key, "language.", 9) == 0 &&
-        strcmp(key, selected_key) != 0)
+        strcmp(key, selected_key) != 0) {
       continue;
+    }
+
     for (const char *p = text; p && *p;) {
-      uint32_t cp = unicode_upper(utf8_next(&p));
-      if (cp >= 128 && !FT_Get_Char_Index(face->ft_face, cp))
+      uint32_t cp = utf8_next(&p);
+
+      if (cp <= 0x007F)
+        continue;
+
+      total_checks++;
+      if (FT_Get_Char_Index(face->ft_face, cp) != 0) {
+        supported_glyphs++;
+      } else {
         return 0;
+      }
     }
   }
-  return 1;
+
+  if (total_checks == 0)
+    return 1;
+  return (supported_glyphs == total_checks);
 }
 
 void font_sync_language_fallback(void) {
+  int old_font_id = language_force_font_id;
   language_force_font_id = 0;
-  if (!primary_font.loaded || active_language_supported(&primary_font))
-    return;
 
-  if (load_fallback_font() && active_language_supported(&fallback_font))
+  if (fallback_font.loaded) {
+    unload_font_face(&fallback_font);
+  }
+
+  if (!primary_font.loaded || active_language_supported(&primary_font)) {
+    if (old_font_id != language_force_font_id) {
+      clear_glyph_cache();
+    }
+    return;
+  }
+
+  if (load_fallback_font() && active_language_supported(&fallback_font)) {
     language_force_font_id = 1;
-  else if (load_latin_fallback() && active_language_supported(&latin_font))
+  } else if (load_latin_fallback() && active_language_supported(&latin_font)) {
     language_force_font_id = 2;
+  }
+
+  clear_glyph_cache();
 }

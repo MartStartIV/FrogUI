@@ -1,4 +1,5 @@
 {
+  "_default.font_name": "alium_Nunito.ttf",
   "language.en_US": "English (US)",
   "language.pl_PL": "Polski",
   "language.es_ES": "Español",
@@ -62,90 +63,90 @@
   "value.not_connected": "not connected",
   "folder.settings": "Settings",
   "folder.recents": "Recent Games",
-  "folder.favourites": "Favourites"
-  ,"header.button_mapping": "BUTTON MAPPING"
-  ,"header.select_core": "SELECT CORE"
-  ,"header.search": "SEARCH"
-  ,"header.add_extension": "ADD EXTENSION"
-  ,"header.usb_mode": "USB MODE"
-  ,"remap.skip": "[B] = skip / keep default"
-  ,"remap.press": "Press  %s  (%d / %d)"
-  ,"remap.saved": "Button mapping saved"
-  ,"remap.save_failed": "Could not save button mapping"
-  ,"button.up": "UP"
-  ,"button.down": "DOWN"
-  ,"button.left": "LEFT"
-  ,"button.right": "RIGHT"
-  ,"picker.cores": "Cores"
-  ,"picker.extensions": "EXTENSIONS"
-  ,"picker.filter_files": "Filter files"
-  ,"picker.add_extension": "Add extension..."
-  ,"keyboard.ok_cancel": "A OK   B cancel"
-  ,"usb.initiated": "USB MTP INITIATED"
-  ,"usb.connect_instruction": "Connect the console to a PC over USB-C"
-  ,"usb.back": "B  BACK"
-  ,"usb.connect_back": "A  CONNECT   B  BACK"
-  ,"usb.ready": "USB MTP READY"
-  ,"usb.transfer_warning": "Do not disconnect while files are transferring"
-  ,"app.activity": "Activity Tracker"
-  ,"app.frogshell": "FrogShell"
-  ,"app.usb_mode": "USB mode"
-  ,"app.ebook_reader": "Ebook Reader"
-  ,"app.image_viewer": "Image Viewer"
-  ,"app.videos": "Videos"
-  ,"app.music_mp3": "Music / MP3"
-  ,"app.rockbox": "Rockbox",
-  "app.shutdown": "Shutdown"
-  ,"pico.menu.resume": "Resume game"
-  ,"pico.menu.save_state": "Save state"
-  ,"pico.menu.load_state": "Load state"
-  ,"pico.menu.disc_control": "Disc control"
-  ,"pico.menu.cheats": "Cheats"
-  ,"pico.menu.options": "Options"
-  ,"pico.menu.reset_game": "Reset game"
-  ,"pico.menu.load_new_game": "Load new game"
-  ,"pico.menu.exit": "Exit"
-  ,"pico.options.audio_video": "Audio and video"
-  ,"pico.options.emulator": "Emulator options"
-  ,"pico.options.player_controls": "Player controls"
-  ,"pico.options.emulator_controls": "Emulator controls"
-  ,"pico.options.save_config": "Save config"
-  ,"pico.video.show_fps": "Show FPS"
-  ,"pico.video.show_cpu": "Show CPU %"
-  ,"pico.video.fast_forward": "Fast forward (SELECT+R1)"
-  ,"pico.video.rewind": "Rewind (hold SELECT+B)"
-  ,"pico.video.aspect_ratio": "Aspect ratio"
-  ,"pico.video.filter": "Filter"
-  ,"pico.video.optimize_text": "Optimize text"
-  ,"pico.video.audio_buffer": "Audio buffer"
-  ,"pico.video.mono_output": "Mono output"
-  ,"pico.video.sharpness": "Sharpness"
-  ,"pico.video.volume": "Volume %"
-  ,"pico.config.save_global": "Save global config"
-  ,"pico.config.save_game": "Save game config"
-  ,"pico.config.delete_game": "Delete game config"
-  ,"pico.config.restore_defaults": "Restore defaults"
-  ,"pico.config.loaded_game": "Loaded: game config"
-  ,"pico.config.loaded_global": "Loaded: global config"
-  ,"pico.legend.back_ok": "B-BACK   A-OKAY"
-  ,"pico.control.up": "UP"
-  ,"pico.control.down": "DOWN"
-  ,"pico.control.left": "LEFT"
-  ,"pico.control.right": "RIGHT"
-  ,"pico.control.a": "A BUTTON"
-  ,"pico.control.b": "B BUTTON"
-  ,"pico.control.x": "X BUTTON"
-  ,"pico.control.y": "Y BUTTON"
-  ,"pico.control.start": "START"
-  ,"pico.control.select": "SELECT"
-  ,"pico.control.l": "L BUTTON"
-  ,"pico.control.r": "R BUTTON"
-  ,"pico.control.l2": "L2 BUTTON"
-  ,"pico.control.r2": "R2 BUTTON"
-  ,"pico.emu.save_state": "Save State"
-  ,"pico.emu.load_state": "Load State"
-  ,"pico.emu.toggle_hud": "Toggle FPS/CPU%"
-  ,"pico.emu.fast_forward": "Toggle FF",
+  "folder.favourites": "Favourites",
+  "header.button_mapping": "BUTTON MAPPING",
+  "header.select_core": "SELECT CORE",
+  "header.search": "SEARCH",
+  "header.add_extension": "ADD EXTENSION",
+  "header.usb_mode": "USB MODE",
+  "remap.skip": "[B] = skip / keep default",
+  "remap.press": "Press  %s  (%d / %d)",
+  "remap.saved": "Button mapping saved",
+  "remap.save_failed": "Could not save button mapping",
+  "button.up": "UP",
+  "button.down": "DOWN",
+  "button.left": "LEFT",
+  "button.right": "RIGHT",
+  "picker.cores": "Cores",
+  "picker.extensions": "EXTENSIONS",
+  "picker.filter_files": "Filter files",
+  "picker.add_extension": "Add extension...",
+  "keyboard.ok_cancel": "A OK   B cancel",
+  "usb.initiated": "USB MTP INITIATED",
+  "usb.connect_instruction": "Connect the console to a PC over USB-C",
+  "usb.back": "B  BACK",
+  "usb.connect_back": "A  CONNECT   B  BACK",
+  "usb.ready": "USB MTP READY",
+  "usb.transfer_warning": "Do not disconnect while files are transferring",
+  "app.activity": "Activity Tracker",
+  "app.frogshell": "FrogShell",
+  "app.usb_mode": "USB mode",
+  "app.ebook_reader": "Ebook Reader",
+  "app.image_viewer": "Image Viewer",
+  "app.videos": "Videos",
+  "app.music_mp3": "Music / MP3",
+  "app.rockbox": "Rockbox",
+  "app.shutdown": "Shutdown",
+  "pico.menu.resume": "Resume game",
+  "pico.menu.save_state": "Save state",
+  "pico.menu.load_state": "Load state",
+  "pico.menu.disc_control": "Disc control",
+  "pico.menu.cheats": "Cheats",
+  "pico.menu.options": "Options",
+  "pico.menu.reset_game": "Reset game",
+  "pico.menu.load_new_game": "Load new game",
+  "pico.menu.exit": "Exit",
+  "pico.options.audio_video": "Audio and video",
+  "pico.options.emulator": "Emulator options",
+  "pico.options.player_controls": "Player controls",
+  "pico.options.emulator_controls": "Emulator controls",
+  "pico.options.save_config": "Save config",
+  "pico.video.show_fps": "Show FPS",
+  "pico.video.show_cpu": "Show CPU %",
+  "pico.video.fast_forward": "Fast forward (SELECT+R1)",
+  "pico.video.rewind": "Rewind (hold SELECT+B)",
+  "pico.video.aspect_ratio": "Aspect ratio",
+  "pico.video.filter": "Filter",
+  "pico.video.optimize_text": "Optimize text",
+  "pico.video.audio_buffer": "Audio buffer",
+  "pico.video.mono_output": "Mono output",
+  "pico.video.sharpness": "Sharpness",
+  "pico.video.volume": "Volume %",
+  "pico.config.save_global": "Save global config",
+  "pico.config.save_game": "Save game config",
+  "pico.config.delete_game": "Delete game config",
+  "pico.config.restore_defaults": "Restore defaults",
+  "pico.config.loaded_game": "Loaded: game config",
+  "pico.config.loaded_global": "Loaded: global config",
+  "pico.legend.back_ok": "B-BACK   A-OKAY",
+  "pico.control.up": "UP",
+  "pico.control.down": "DOWN",
+  "pico.control.left": "LEFT",
+  "pico.control.right": "RIGHT",
+  "pico.control.a": "A BUTTON",
+  "pico.control.b": "B BUTTON",
+  "pico.control.x": "X BUTTON",
+  "pico.control.y": "Y BUTTON",
+  "pico.control.start": "START",
+  "pico.control.select": "SELECT",
+  "pico.control.l": "L BUTTON",
+  "pico.control.r": "R BUTTON",
+  "pico.control.l2": "L2 BUTTON",
+  "pico.control.r2": "R2 BUTTON",
+  "pico.emu.save_state": "Save State",
+  "pico.emu.load_state": "Load State",
+  "pico.emu.toggle_hud": "Toggle FPS/CPU%",
+  "pico.emu.fast_forward": "Toggle FF",
   "system.a26": "Atari 2600",
   "system.a5200": "Atari 5200",
   "system.a78": "Atari 7800",

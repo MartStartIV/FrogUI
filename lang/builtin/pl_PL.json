@@ -1,4 +1,5 @@
 {
+  "_default.font_name": "alium_Nunito.ttf",
   "language.en_US": "English (US)",
   "language.pl_PL": "Polski",
   "language.es_ES": "Español",
@@ -62,90 +63,90 @@
   "value.not_connected": "nie podłączono",
   "folder.settings": "Ustawienia",
   "folder.recents": "Ostatnie gry",
-  "folder.favourites": "Ulubione"
-  ,"header.button_mapping": "MAPOWANIE PRZYCISKÓW"
-  ,"header.select_core": "WYBIERZ RDZEŃ"
-  ,"header.search": "SZUKAJ"
-  ,"header.add_extension": "DODAJ ROZSZERZENIE"
-  ,"header.usb_mode": "TRYB USB"
-  ,"remap.skip": "[B] = pomiń / zachowaj domyślne"
-  ,"remap.press": "Naciśnij  %s  (%d / %d)"
-  ,"remap.saved": "Mapowanie przycisków zapisane"
-  ,"remap.save_failed": "Nie udało się zapisać mapowania przycisków"
-  ,"button.up": "GÓRA"
-  ,"button.down": "DÓŁ"
-  ,"button.left": "LEWO"
-  ,"button.right": "PRAWO"
-  ,"picker.cores": "Rdzenie"
-  ,"picker.extensions": "ROZSZERZENIA"
-  ,"picker.filter_files": "Filtruj pliki"
-  ,"picker.add_extension": "Dodaj rozszerzenie..."
-  ,"keyboard.ok_cancel": "A OK   B anuluj"
-  ,"usb.initiated": "MTP USB URUCHOMIONE"
-  ,"usb.connect_instruction": "Podłącz konsolę do PC przez USB-C"
-  ,"usb.back": "B  WSTECZ"
-  ,"usb.connect_back": "A  POŁĄCZ   B  WSTECZ"
-  ,"usb.ready": "MTP USB GOTOWE"
-  ,"usb.transfer_warning": "Nie odłączaj podczas przesyłania plików"
-  ,"app.activity": "Śledzenie aktywności"
-  ,"app.frogshell": "FrogShell"
-  ,"app.usb_mode": "Połączenie USB"
-  ,"app.ebook_reader": "Czytnik e-booków"
-  ,"app.image_viewer": "Obrazy"
-  ,"app.videos": "Wideo"
-  ,"app.music_mp3": "Muzyka / MP3"
-  ,"app.rockbox": "Rockbox"
-  ,"app.shutdown": "Wyłączanie"
-  ,"pico.menu.resume": "Wznów grę"
-  ,"pico.menu.save_state": "Zapisz stan"
-  ,"pico.menu.load_state": "Wczytaj stan"
-  ,"pico.menu.disc_control": "Sterowanie dyskiem"
-  ,"pico.menu.cheats": "Kody"
-  ,"pico.menu.options": "Opcje"
-  ,"pico.menu.reset_game": "Zresetuj grę"
-  ,"pico.menu.load_new_game": "Wczytaj nową grę"
-  ,"pico.menu.exit": "Wyjdź"
-  ,"pico.options.audio_video": "Dźwięk i obraz"
-  ,"pico.options.emulator": "Opcje emulatora"
-  ,"pico.options.player_controls": "Sterowanie gracza"
-  ,"pico.options.emulator_controls": "Sterowanie emulatorem"
-  ,"pico.options.save_config": "Zapisz konfigurację"
-  ,"pico.video.show_fps": "Pokaż FPS"
-  ,"pico.video.show_cpu": "Pokaż użycie CPU %"
-  ,"pico.video.fast_forward": "Przewijanie (SELECT+R1)"
-  ,"pico.video.rewind": "Cofanie (przytrzymaj SELECT+B)"
-  ,"pico.video.aspect_ratio": "Proporcje ekranu"
-  ,"pico.video.filter": "Filtr"
-  ,"pico.video.optimize_text": "Optymalizuj tekst"
-  ,"pico.video.audio_buffer": "Bufor dźwięku"
-  ,"pico.video.mono_output": "Dźwięk mono"
-  ,"pico.video.sharpness": "Ostrość"
-  ,"pico.video.volume": "Głośność %"
-  ,"pico.config.save_global": "Zapisz konfigurację globalną"
-  ,"pico.config.save_game": "Zapisz konfigurację gry"
-  ,"pico.config.delete_game": "Usuń konfigurację gry"
-  ,"pico.config.restore_defaults": "Przywróć domyślne"
-  ,"pico.config.loaded_game": "Wczytano konfigurację gry"
-  ,"pico.config.loaded_global": "Wczytano konfigurację globalną"
-  ,"pico.legend.back_ok": "B-WSTECZ   A-OK"
-  ,"pico.control.up": "GÓRA"
-  ,"pico.control.down": "DÓŁ"
-  ,"pico.control.left": "LEWO"
-  ,"pico.control.right": "PRAWO"
-  ,"pico.control.a": "PRZYCISK A"
-  ,"pico.control.b": "PRZYCISK B"
-  ,"pico.control.x": "PRZYCISK X"
-  ,"pico.control.y": "PRZYCISK Y"
-  ,"pico.control.start": "START"
-  ,"pico.control.select": "SELECT"
-  ,"pico.control.l": "PRZYCISK L"
-  ,"pico.control.r": "PRZYCISK R"
-  ,"pico.control.l2": "PRZYCISK L2"
-  ,"pico.control.r2": "PRZYCISK R2"
-  ,"pico.emu.save_state": "Zapisz stan"
-  ,"pico.emu.load_state": "Wczytaj stan"
-  ,"pico.emu.toggle_hud": "Przełącz FPS/CPU%"
-  ,"pico.emu.fast_forward": "Przełącz przewijanie",
+  "folder.favourites": "Ulubione",
+  "header.button_mapping": "MAPOWANIE PRZYCISKÓW",
+  "header.select_core": "WYBIERZ RDZEŃ",
+  "header.search": "SZUKAJ",
+  "header.add_extension": "DODAJ ROZSZERZENIE",
+  "header.usb_mode": "TRYB USB",
+  "remap.skip": "[B] = pomiń / zachowaj domyślne",
+  "remap.press": "Naciśnij  %s  (%d / %d)",
+  "remap.saved": "Mapowanie przycisków zapisane",
+  "remap.save_failed": "Nie udało się zapisać mapowania przycisków",
+  "button.up": "GÓRA",
+  "button.down": "DÓŁ",
+  "button.left": "LEWO",
+  "button.right": "PRAWO",
+  "picker.cores": "Rdzenie",
+  "picker.extensions": "ROZSZERZENIA",
+  "picker.filter_files": "Filtruj pliki",
+  "picker.add_extension": "Dodaj rozszerzenie...",
+  "keyboard.ok_cancel": "A OK   B anuluj",
+  "usb.initiated": "MTP USB URUCHOMIONE",
+  "usb.connect_instruction": "Podłącz konsolę do PC przez USB-C",
+  "usb.back": "B  WSTECZ",
+  "usb.connect_back": "A  POŁĄCZ   B  WSTECZ",
+  "usb.ready": "MTP USB GOTOWE",
+  "usb.transfer_warning": "Nie odłączaj podczas przesyłania plików",
+  "app.activity": "Śledzenie aktywności",
+  "app.frogshell": "FrogShell",
+  "app.usb_mode": "Połączenie USB",
+  "app.ebook_reader": "Czytnik e-booków",
+  "app.image_viewer": "Obrazy",
+  "app.videos": "Wideo",
+  "app.music_mp3": "Muzyka / MP3",
+  "app.rockbox": "Rockbox",
+  "app.shutdown": "Wyłączanie",
+  "pico.menu.resume": "Wznów grę",
+  "pico.menu.save_state": "Zapisz stan",
+  "pico.menu.load_state": "Wczytaj stan",
+  "pico.menu.disc_control": "Sterowanie dyskiem",
+  "pico.menu.cheats": "Kody",
+  "pico.menu.options": "Opcje",
+  "pico.menu.reset_game": "Zresetuj grę",
+  "pico.menu.load_new_game": "Wczytaj nową grę",
+  "pico.menu.exit": "Wyjdź",
+  "pico.options.audio_video": "Dźwięk i obraz",
+  "pico.options.emulator": "Opcje emulatora",
+  "pico.options.player_controls": "Sterowanie gracza",
+  "pico.options.emulator_controls": "Sterowanie emulatorem",
+  "pico.options.save_config": "Zapisz konfigurację",
+  "pico.video.show_fps": "Pokaż FPS",
+  "pico.video.show_cpu": "Pokaż użycie CPU %",
+  "pico.video.fast_forward": "Przewijanie (SELECT+R1)",
+  "pico.video.rewind": "Cofanie (przytrzymaj SELECT+B)",
+  "pico.video.aspect_ratio": "Proporcje ekranu",
+  "pico.video.filter": "Filtr",
+  "pico.video.optimize_text": "Optymalizuj tekst",
+  "pico.video.audio_buffer": "Bufor dźwięku",
+  "pico.video.mono_output": "Dźwięk mono",
+  "pico.video.sharpness": "Ostrość",
+  "pico.video.volume": "Głośność %",
+  "pico.config.save_global": "Zapisz konfigurację globalną",
+  "pico.config.save_game": "Zapisz konfigurację gry",
+  "pico.config.delete_game": "Usuń konfigurację gry",
+  "pico.config.restore_defaults": "Przywróć domyślne",
+  "pico.config.loaded_game": "Wczytano konfigurację gry",
+  "pico.config.loaded_global": "Wczytano konfigurację globalną",
+  "pico.legend.back_ok": "B-WSTECZ   A-OK",
+  "pico.control.up": "GÓRA",
+  "pico.control.down": "DÓŁ",
+  "pico.control.left": "LEWO",
+  "pico.control.right": "PRAWO",
+  "pico.control.a": "PRZYCISK A",
+  "pico.control.b": "PRZYCISK B",
+  "pico.control.x": "PRZYCISK X",
+  "pico.control.y": "PRZYCISK Y",
+  "pico.control.start": "START",
+  "pico.control.select": "SELECT",
+  "pico.control.l": "PRZYCISK L",
+  "pico.control.r": "PRZYCISK R",
+  "pico.control.l2": "PRZYCISK L2",
+  "pico.control.r2": "PRZYCISK R2",
+  "pico.emu.save_state": "Zapisz stan",
+  "pico.emu.load_state": "Wczytaj stan",
+  "pico.emu.toggle_hud": "Przełącz FPS/CPU%",
+  "pico.emu.fast_forward": "Przełącz przewijanie",
   "system.a26": "Atari 2600",
   "system.a5200": "Atari 5200",
   "system.a78": "Atari 7800",
