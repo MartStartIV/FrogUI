@@ -1,4 +1,5 @@
 {
+  "_default.font_name": "alium_Nunito.ttf",
   "language.en_US": "English (US)",
   "language.pl_PL": "Polski",
   "language.es_ES": "Español",
@@ -62,75 +63,75 @@
   "value.not_connected": "не подключено",
   "folder.settings": "Настройки",
   "folder.recents": "Недавние игры",
-  "folder.favourites": "Избранное"
-  ,"header.button_mapping": "НАЗНАЧЕНИЕ КНОПОК"
-  ,"header.select_core": "ВЫБОР ЯДРА"
-  ,"header.search": "ПОИСК"
-  ,"header.add_extension": "ДОБАВИТЬ РАСШИРЕНИЕ"
-  ,"header.usb_mode": "РЕЖИМ USB"
-  ,"remap.skip": "[B] = пропустить / оставить по умолчанию"
-  ,"remap.press": "Нажмите  %s  (%d / %d)"
-  ,"remap.saved": "Назначение кнопок сохранено"
-  ,"remap.save_failed": "Не удалось сохранить назначение кнопок"
-  ,"button.up": "ВВЕРХ"
-  ,"button.down": "ВНИЗ"
-  ,"button.left": "ВЛЕВО"
-  ,"button.right": "ВПРАВО"
-  ,"picker.cores": "Ядра"
-  ,"picker.extensions": "РАСШИРЕНИЯ"
-  ,"picker.filter_files": "Фильтр файлов"
-  ,"picker.add_extension": "Добавить расширение..."
-  ,"keyboard.ok_cancel": "A ОК   B отмена"
-  ,"usb.initiated": "USB MTP ЗАПУЩЕН"
-  ,"usb.connect_instruction": "Подключите консоль к ПК через USB-C"
-  ,"usb.back": "B  НАЗАД"
-  ,"usb.connect_back": "A  ПОДКЛЮЧИТЬ   B  НАЗАД"
-  ,"usb.ready": "USB MTP ГОТОВ"
-  ,"usb.transfer_warning": "Не отключайте устройство во время передачи файлов"
-  ,"app.activity": "Статистика активности"
-  ,"app.frogshell": "FrogShell"
-  ,"app.usb_mode": "Режим USB"
-  ,"app.ebook_reader": "Читалка электронных книг"
-  ,"app.image_viewer": "Просмотр изображений"
-  ,"app.videos": "Видео"
-  ,"app.music_mp3": "Музыка / MP3"
-  ,"app.rockbox": "Rockbox"
-  ,"app.shutdown": "Выключение"
-  ,"pico.menu.resume": "Продолжить игру"
-  ,"pico.menu.save_state": "Сохранить состояние"
-  ,"pico.menu.load_state": "Загрузить состояние"
-  ,"pico.menu.disc_control": "Управление диском"
-  ,"pico.menu.cheats": "Читы"
-  ,"pico.menu.options": "Опции"
-  ,"pico.menu.reset_game": "Перезапустить игру"
-  ,"pico.menu.load_new_game": "Загрузить новую игру"
-  ,"pico.menu.exit": "Выйти"
-  ,"pico.options.audio_video": "Аудио и видео"
-  ,"pico.options.emulator": "Настройки эмулятора"
-  ,"pico.options.player_controls": "Управление игрока"
-  ,"pico.options.emulator_controls": "Управление эмулятором"
-  ,"pico.options.save_config": "Сохранить конфигурацию"
-  ,"pico.video.show_fps": "Показывать FPS"
-  ,"pico.video.show_cpu": "Показывать загрузку CPU %"
-  ,"pico.video.fast_forward": "Ускорение (SELECT+R1)"
-  ,"pico.video.rewind": "Перемотка (удерживать SELECT+B)"
-  ,"pico.video.aspect_ratio": "Соотношение сторон"
-  ,"pico.video.filter": "Фильтр"
-  ,"pico.video.optimize_text": "Оптимизировать текст"
-  ,"pico.video.audio_buffer": "Аудиобуфер"
-  ,"pico.video.mono_output": "Монофонический звук"
-  ,"pico.video.sharpness": "Резкость"
-  ,"pico.video.volume": "Громкость %"
-  ,"pico.config.save_global": "Сохранить общую конфигурацию"
-  ,"pico.config.save_game": "Сохранить конфигурацию игры"
-  ,"pico.config.delete_game": "Удалить конфигурацию игры"
-  ,"pico.config.restore_defaults": "Восстановить значения по умолчанию"
-  ,"pico.config.loaded_game": "Загружено: конфигурация игры"
-  ,"pico.config.loaded_global": "Загружено: общая конфигурация"
-  ,"pico.legend.back_ok": "B-НАЗАД   A-OK"
-  ,"pico.emu.save_state": "Сохранить состояние"
-  ,"pico.emu.load_state": "Загрузить состояние"
-  ,"pico.emu.toggle_hud": "Переключить FPS/CPU%",
+  "folder.favourites": "Избранное",
+  "header.button_mapping": "НАЗНАЧЕНИЕ КНОПОК",
+  "header.select_core": "ВЫБОР ЯДРА",
+  "header.search": "ПОИСК",
+  "header.add_extension": "ДОБАВИТЬ РАСШИРЕНИЕ",
+  "header.usb_mode": "РЕЖИМ USB",
+  "remap.skip": "[B] = пропустить / оставить по умолчанию",
+  "remap.press": "Нажмите  %s  (%d / %d)",
+  "remap.saved": "Назначение кнопок сохранено",
+  "remap.save_failed": "Не удалось сохранить назначение кнопок",
+  "button.up": "ВВЕРХ",
+  "button.down": "ВНИЗ",
+  "button.left": "ВЛЕВО",
+  "button.right": "ВПРАВО",
+  "picker.cores": "Ядра",
+  "picker.extensions": "РАСШИРЕНИЯ",
+  "picker.filter_files": "Фильтр файлов",
+  "picker.add_extension": "Добавить расширение...",
+  "keyboard.ok_cancel": "A ОК   B отмена",
+  "usb.initiated": "USB MTP ЗАПУЩЕН",
+  "usb.connect_instruction": "Подключите консоль к ПК через USB-C",
+  "usb.back": "B  НАЗАД",
+  "usb.connect_back": "A  ПОДКЛЮЧИТЬ   B  НАЗАД",
+  "usb.ready": "USB MTP ГОТОВ",
+  "usb.transfer_warning": "Не отключайте устройство во время передачи файлов",
+  "app.activity": "Статистика активности",
+  "app.frogshell": "FrogShell",
+  "app.usb_mode": "Режим USB",
+  "app.ebook_reader": "Читалка электронных книг",
+  "app.image_viewer": "Просмотр изображений",
+  "app.videos": "Видео",
+  "app.music_mp3": "Музыка / MP3",
+  "app.rockbox": "Rockbox",
+  "app.shutdown": "Выключение",
+  "pico.menu.resume": "Продолжить игру",
+  "pico.menu.save_state": "Сохранить состояние",
+  "pico.menu.load_state": "Загрузить состояние",
+  "pico.menu.disc_control": "Управление диском",
+  "pico.menu.cheats": "Читы",
+  "pico.menu.options": "Опции",
+  "pico.menu.reset_game": "Перезапустить игру",
+  "pico.menu.load_new_game": "Загрузить новую игру",
+  "pico.menu.exit": "Выйти",
+  "pico.options.audio_video": "Аудио и видео",
+  "pico.options.emulator": "Настройки эмулятора",
+  "pico.options.player_controls": "Управление игрока",
+  "pico.options.emulator_controls": "Управление эмулятором",
+  "pico.options.save_config": "Сохранить конфигурацию",
+  "pico.video.show_fps": "Показывать FPS",
+  "pico.video.show_cpu": "Показывать загрузку CPU %",
+  "pico.video.fast_forward": "Ускорение (SELECT+R1)",
+  "pico.video.rewind": "Перемотка (удерживать SELECT+B)",
+  "pico.video.aspect_ratio": "Соотношение сторон",
+  "pico.video.filter": "Фильтр",
+  "pico.video.optimize_text": "Оптимизировать текст",
+  "pico.video.audio_buffer": "Аудиобуфер",
+  "pico.video.mono_output": "Монофонический звук",
+  "pico.video.sharpness": "Резкость",
+  "pico.video.volume": "Громкость %",
+  "pico.config.save_global": "Сохранить общую конфигурацию",
+  "pico.config.save_game": "Сохранить конфигурацию игры",
+  "pico.config.delete_game": "Удалить конфигурацию игры",
+  "pico.config.restore_defaults": "Восстановить значения по умолчанию",
+  "pico.config.loaded_game": "Загружено: конфигурация игры",
+  "pico.config.loaded_global": "Загружено: общая конфигурация",
+  "pico.legend.back_ok": "B-НАЗАД   A-OK",
+  "pico.emu.save_state": "Сохранить состояние",
+  "pico.emu.load_state": "Загрузить состояние",
+  "pico.emu.toggle_hud": "Переключить FPS/CPU%",
   "pico.emu.fast_forward": "Переключить ускорение",
   "pico.control.up": "ВВЕРХ",
   "pico.control.down": "ВНИЗ",
